@@ -19,15 +19,22 @@ export const blogRouter = new Hono<{
   
     const header = c.req.header("authorization") || "";
     const response = await verify(header, c.env.JWT_SECRET);
-    if(response){
-        //@ts-ignore
-        c.set("userId", response.id)
-      await next()
-    }else{
-      c.status(403);
-      return c.json({
-        msg:"not auth and jwt token"
-      })
+    try {
+        if(response){
+            //@ts-ignore
+            c.set("userId", response.id)
+          await next()
+        }else{
+          c.status(403);
+          return c.json({
+            msg:"not auth and jwt token"
+          })
+        }
+    } catch (error) {
+        c.status(403);
+          return c.json({
+            msg:"you are not logged in"
+          })
     }
   })
 
